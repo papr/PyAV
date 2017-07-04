@@ -20,4 +20,7 @@ cdef extern from "libavdevice/avdevice.h" nogil:
     AVInputFormat * av_input_video_device_next(AVInputFormat *d)
     AVOutputFormat * av_output_audio_device_next(AVOutputFormat *d)
     AVOutputFormat * av_output_video_device_next(AVOutputFormat *d)
-    int avdevice_list_devices(AVFormatContext *s, AVDeviceInfoList **device_list)
+    int avdevice_list_input_sources(AVInputFormat *device,
+                                    const char *device_name,
+                                    AVDictionary *device_options,
+                                    AVDeviceInfoList **device_list)

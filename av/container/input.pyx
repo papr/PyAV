@@ -135,30 +135,20 @@ cdef class InputContainer(Container):
 
 def input_audio_devices():
     cdef lib.AVInputFormat *iptr = NULL
-    cdef lib.AVFormatContext* format_context = NULL
     cdef lib.AVDeviceInfoList* dev_list = NULL
     cdef lib.AVDeviceInfo* dev = NULL
 
+    lib.avdevice_register_all()
+
     while True:
         iptr = lib.av_input_audio_device_next(iptr)
-        if not iptr:
+        if iptr == NULL:
             break
-
-        format_context = lib.avformat_alloc_context()
-        format_context.iformat = iptr
-
-        lib.avdevice_list_devices(format_context, &dev_list)
-        if dev_list:
+        if lib.avdevice_list_input_sources(iptr, NULL, NULL, &dev_list) >= 0:
             for i in range(dev_list.nb_devices):
                 dev = dev_list.devices[i]
-
                 # c -> python
                 dev_name = dev.device_name
                 dev_desc = dev.device_description
-                # yield  dev_name, dev_desc
-                # yield 5
-
-        format_context.iformat = NULL
-        lib.avformat_free_context(format_context)
-
-
+                yield  dev_name, dev_desc
+            dev_list = NULL
